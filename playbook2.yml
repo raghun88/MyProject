@@ -1,0 +1,20 @@
+---
+
+- hosts: webserver
+  become: true
+  become_user: root
+  tasks:
+  - name: Install Git, Docker & Tree
+    yum: name={{item}} state=present
+    loop:
+    - git
+    - docker
+    - tree
+  - name: start docker
+    service: name=docker state=started
+  - name: clone the repo
+    git: repo=https://github.com/Sonal0409/AnsibleDockerdemo.git dest=/tmp/repo
+  - name: Build the dockerfile
+    command: chdir=/tmp/repo docker build -t myimage:ansible .
+  - name: Running the image for container creation
+    command: docker run -itd  -P myimage:ansible
